@@ -155,7 +155,7 @@ func (c Config) GetImagePullPolicy() string {
 func (c Config) GetDefaultPlatform() string {
     val, ok := c.Data[keyTrivyDefaultPlatform]
     if !ok {
-        return "amd64"
+        return "linux/amd64"
     }
     return val
 }
