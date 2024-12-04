@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"os"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/utils/ptr"
@@ -161,6 +162,7 @@ func GetPodSpecForStandaloneMode(ctx trivyoperator.PluginContext,
 			continue
 		}
 		env := []corev1.EnvVar{
+			constructEnvVarSourceFromConfigMap("TRIVY_PLATFORM", trivyConfigName, keyTrivyDefaultPlatform),
 			constructEnvVarSourceFromConfigMap("TRIVY_SEVERITY", trivyConfigName, KeyTrivySeverity),
 			constructEnvVarSourceFromConfigMap("TRIVY_IGNORE_UNFIXED", trivyConfigName, keyTrivyIgnoreUnfixed),
 			constructEnvVarSourceFromConfigMap("TRIVY_OFFLINE_SCAN", trivyConfigName, keyTrivyOfflineScan),
@@ -556,7 +558,6 @@ func initContainerEnvVar(trivyConfigName string, config Config) []corev1.EnvVar 
 	}
 	return envs
 }
-
 func getCommandAndArgs(ctx trivyoperator.PluginContext, mode Mode, imageRef string, trivyServerURL string, resultFileName string) ([]string, []string) {
 	command := []string{
 		"trivy",
@@ -589,6 +590,11 @@ func getCommandAndArgs(ctx trivyoperator.PluginContext, mode Mode, imageRef stri
 	} else if mode != ClientServer {
 		skipUpdate = SkipDBUpdate(c)
 	}
+    platform, platformSet := os.LookupEnv("TRIVY_PLATFORM")
+    var platformArg string
+    if platformSet && platform != "" {
+        platformArg = fmt.Sprintf("--platform %s", platform)
+    }	
 	if !compressLogs {
 		args := []string{
 			"--cache-dir",
@@ -599,6 +605,11 @@ func getCommandAndArgs(ctx trivyoperator.PluginContext, mode Mode, imageRef stri
 			getSecurityChecks(ctx),
 			"--format",
 			"json",
+		}
+		
+		// Append the platform argument if it exists
+		if platformArg != "" {
+			args = append(args, platformArg)
 		}
 		if len(trivyServerURL) > 0 {
 			args = append(args, []string{"--server", trivyServerURL}...)

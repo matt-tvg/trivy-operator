@@ -29,6 +29,7 @@ const (
 	keyTrivyAdditionalVulnerabilityReportFields = "trivy.additionalVulnerabilityReportFields"
 	keyTrivyCommand                             = "trivy.command"
 	keyTrivySbomSources                         = "trivy.sbomSources"
+	keyTrivyDefaultPlatform						= "trivy.defaultPlatform" 
 	KeyTrivySeverity                            = "trivy.severity"
 	keyTrivySlow                                = "trivy.slow"
 	keyTrivyVulnType                            = "trivy.vulnType"
