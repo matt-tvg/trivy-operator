@@ -29,6 +29,7 @@ const (
 	keyTrivyAdditionalVulnerabilityReportFields = "trivy.additionalVulnerabilityReportFields"
 	keyTrivyCommand                             = "trivy.command"
 	keyTrivySbomSources                         = "trivy.sbomSources"
+	keyTrivyDefaultPlatform			            = "trivy.defaultPlatform" 
 	KeyTrivySeverity                            = "trivy.severity"
 	keyTrivySlow                                = "trivy.slow"
 	keyTrivyVulnType                            = "trivy.vulnType"
@@ -149,6 +150,14 @@ func (c Config) GetImagePullPolicy() string {
 		return "IfNotPresent"
 	}
 	return ipp
+}
+
+func (c Config) GetDefaultPlatform() string {
+    val, ok := c.Data[keyTrivyDefaultPlatform]
+    if !ok {
+        return "linux/amd64"
+    }
+    return val
 }
 
 func (c Config) GetMode() Mode {
